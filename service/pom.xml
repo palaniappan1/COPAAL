@@ -108,7 +108,7 @@
 			<version>1.5</version>
 		</dependency>
 
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.aksw.simba</groupId>
 			<artifactId>BENGAL</artifactId>
 			<version>1.0-SNAPSHOT</version>
@@ -121,8 +121,12 @@
 					<groupId>edu.berkeley.compbio</groupId>
 					<artifactId>jlibsvm</artifactId>
 				</exclusion>
+				<!-- <exclusion>
+					<groupId>org.aksw.semweb2nl</groupId>
+					<artifactId>triple2nl</artifactId>
+				</exclusion> -->
 			</exclusions>
-		</dependency> -->
+		</dependency>
 
 
 		<dependency>
@@ -176,6 +180,7 @@
 		  	<groupId>org.dice-research</groupId>
 			<artifactId>LD2NL</artifactId>
 			<version>0.4.1-SNAPSHOT</version>
+			<type>pom</type>
 		</dependency>
 	</dependencies>
 
