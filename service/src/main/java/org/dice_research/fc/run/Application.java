@@ -6,6 +6,8 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import java.io.IOException;
+
 /**
  * Launches the application as a REST service
  *
@@ -17,5 +19,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class Application {
   public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
+    SocketServer server = new SocketServer();
+    try {
+      server.start(6666);
+    }
+    catch (IOException ioException){
+      ioException.printStackTrace();
+    }
   }
 }
