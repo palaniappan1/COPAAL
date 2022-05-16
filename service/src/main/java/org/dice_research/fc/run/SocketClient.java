@@ -39,4 +39,14 @@ public class SocketClient {
         out.close();
         clientSocket.close();
     }
+
+    public static void main (String[] args){
+        SocketClient socketClient = new SocketClient();
+        try {
+            socketClient.startConnection("127.0.0.1", 9898);
+        }
+        catch (Exception exception){
+
+        }
+    }
 }

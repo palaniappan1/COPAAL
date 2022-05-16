@@ -27,4 +27,13 @@ public class SocketServer {
         clientSocket.close();
         serverSocket.close();
     }
+
+    public static void main(String[] args) {
+        try {
+            new SocketServer().start(9898);
+            new SocketClient().sendMessage("Subject","Object","Property");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

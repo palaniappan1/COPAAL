@@ -19,12 +19,5 @@ import java.io.IOException;
 public class Application {
   public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
-    SocketServer server = new SocketServer();
-    try {
-      server.start(6666);
-    }
-    catch (IOException ioException){
-      ioException.printStackTrace();
-    }
   }
 }

@@ -41,8 +41,10 @@ CMD ["mvn","-version"]
 
 
 RUN git clone "https://github.com/palaniappan1/COPAAL"
-WORKDIR /COPAAL
-RUN cd service
-RUN ["javac", "EntryPoint.java"]
-ENTRYPOINT ["java","EntryPoint"]
+WORKDIR /COPAAL/service/src/main/java/org/dice_research/fc/run
+CMD ["ls"]
+#RUN ["javac", "EntryPoint.java"]
+#ENTRYPOINT ["java","EntryPoint"]
+RUN ["javac", "SocketServer.java"]
+#ENTRYPOINT ["java","SocketServer"]
 
