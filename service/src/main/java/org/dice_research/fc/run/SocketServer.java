@@ -1,5 +1,11 @@
 package org.dice_research.fc.run;
 
+import org.dice_research.fc.paths.PathBasedFactChecker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,11 +19,15 @@ public class SocketServer {
     private PrintWriter out;
     private BufferedReader in;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SocketServer.class);
+
     public void start(int port) throws IOException {
         serverSocket = new ServerSocket(port);
+        LOGGER.info("ServerSocket Started");
         clientSocket = serverSocket.accept();
         out = new PrintWriter(clientSocket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        LOGGER.info("Out and in variables assiged");
         out.println(1.0);
     }
 

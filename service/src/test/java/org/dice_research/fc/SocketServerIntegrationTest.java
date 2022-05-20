@@ -2,6 +2,7 @@ package org.dice_research.fc;
 
 import org.dice_research.fc.run.Application;
 import org.dice_research.fc.run.SocketClient;
+import org.dice_research.fc.run.SocketNew;
 import org.dice_research.fc.run.SocketServer;
 import org.junit.After;
 import org.junit.Before;
@@ -12,7 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
@@ -20,9 +23,11 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class SocketServerIntegrationTest {
-    private SocketClient client;
+    private Socket client;
 
     private static int port;
+
+    private static PrintWriter out;
 
     @BeforeClass
     public static void start() throws InterruptedException, IOException {
@@ -34,20 +39,15 @@ public class SocketServerIntegrationTest {
 
         Executors.newSingleThreadExecutor()
                 .submit(() -> {
-                    try {
-                        new SocketServer().start(port);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    new SocketNew().serverStart(port);
                 });
         Thread.sleep(500);
     }
 
     @Before
     public void init() {
-        client = new SocketClient();
         try {
-            client.startConnection("127.0.0.1", port);
+            client = new Socket("127.0.0.1",port);
         }
         catch (IOException exception){
             exception.printStackTrace();
@@ -58,23 +58,21 @@ public class SocketServerIntegrationTest {
     @Test
     public void givenSocketClient_whenServerRespondsWhenStarted_thenCorrect() {
         Float response = 0f;
-        String subject = "http://dbpedia.org/resource/Barack_Obama";
-        String object = "http://dbpedia.org/ontology/nationality";
-        String property = "http://dbpedia.org/resource/United_States";
+        String data = "http://dbpedia.org/resource/Barack_Obama http://dbpedia.org/resource/United_States http://dbpedia.org/ontology/nationality";
         try{
-//            response = client.sendMessage(fact);
-            response = client.sendMessage(subject,object,property);
+            out = new PrintWriter(client.getOutputStream(), true);
+            out.println(data);
         }
         catch (IOException exception){
             exception.printStackTrace();
         }
-        assertEquals(1.0,response,0.1);
+//        assertEquals(1.0,response,0.1);
     }
 
     @After
     public void finish() {
         try {
-            client.stopConnection();
+            client.close();
         }catch (IOException exception){
             exception.printStackTrace();
         }
