@@ -1,13 +1,12 @@
+FROM openjdk:8-jdk-alpine
+RUN apk add --no-cache curl tar bash procps
+RUN apk update && apk add git
 RUN git clone "https://github.com/palaniappan1/COPAAL"
 
 FROM maven:3.6.0-jdk-11-slim AS build
 COPY /service/pom.xml .
 RUN mvn -B -f pom.xml dependency:go-offline
 COPY . /app
-RUN ls -la
-
-EXPOSE 3333
-WORKDIR /COPAAL/service/src/main/java/org/dice_research/fc/run
-ENTRYPOINT ["java","-jar","/app.jar"]
-#CMD ["nc localhost 3333"]
-
+COPY service/target/corraborative-2.2.2.jar /app
+EXPOSE 3333/tcp
+ENTRYPOINT ["java","-jar","/app/corraborative-2.2.2.jar"]

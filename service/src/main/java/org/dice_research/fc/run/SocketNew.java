@@ -14,8 +14,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -43,6 +45,8 @@ public class SocketNew  {
     public void serverStart(int portNumber) {
         try {
             serverSocket = new ServerSocket(portNumber);
+            SocketAddress sockeAddress = new InetSocketAddress("0.0.0.0",portNumber);
+            serverSocket.bind(sockeAddress);
             clientSocket = serverSocket.accept();
             LOGGER.info("Client Accepted " + clientSocket.getLocalPort() + "  " + clientSocket.getPort());
             LOGGER.info("Context is  " + ctx);
