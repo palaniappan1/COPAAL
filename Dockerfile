@@ -8,5 +8,5 @@ COPY /service/pom.xml .
 RUN mvn -B -f pom.xml dependency:go-offline
 COPY . /app
 COPY service/target/corraborative-2.2.2.jar /app
-EXPOSE 3333/tcp
+EXPOSE 3333
 ENTRYPOINT ["java","-jar","/app/corraborative-2.2.2.jar"]
