@@ -13,8 +13,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 
 @Component()
 public class SocketNew  {
@@ -39,7 +41,8 @@ public class SocketNew  {
     public void serverStart(int portNumber) {
         try {
             serverSocket = new ServerSocket(portNumber);
-//            SocketAddress sockeAddress = new InetSocketAddress("0.0.0.0",portNumber);
+            LOGGER.info("Socket is up and running on Local Port" + serverSocket.getLocalPort() + " and on Local Socket Address"+serverSocket.getLocalSocketAddress() );
+//            SocketAddress sockeAddress = new InetSocketAddress("127.0.0.1",portNumber);
 //            serverSocket.bind(sockeAddress);
             clientSocket = serverSocket.accept();
             LOGGER.info("Client Accepted " + clientSocket.getLocalPort() + "  " + clientSocket.getPort());
