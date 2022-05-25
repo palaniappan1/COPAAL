@@ -95,7 +95,7 @@ public class SocketNew  {
         return result;
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void startSocketProcedure() {
         serverStart(3333);
         listenAndRespondToData();
