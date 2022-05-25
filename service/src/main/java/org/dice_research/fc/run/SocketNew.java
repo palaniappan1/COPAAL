@@ -17,6 +17,8 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Component()
 public class SocketNew  {
@@ -39,18 +41,28 @@ public class SocketNew  {
     Socket clientSocket = null;
 
     public void serverStart(int portNumber) {
-        try {
-            serverSocket = new ServerSocket(portNumber);
-            LOGGER.info("Socket is up and running on Local Port" + serverSocket.getLocalPort() + " and on Local Socket Address"+serverSocket.getLocalSocketAddress() );
+        Runnable serverTask = () -> {
+            try {
+                serverSocket = new ServerSocket(portNumber);
+                LOGGER.info("Socket is up and running on Local Port" + serverSocket.getLocalPort() + " and on Local Socket Address"+serverSocket.getLocalSocketAddress() );
+                LOGGER.info("Waiting for clients to connect...");
+                while (true) {
+                    clientSocket = serverSocket.accept();
+                    listenAndRespondToData();
+                    LOGGER.info("Client Accepted " + clientSocket.getLocalPort() + "  " + clientSocket.getPort());
+                    LOGGER.info("Context is  " + ctx);
+                }
+            } catch (IOException e) {
+                System.err.println("Unable to process client request");
+                e.printStackTrace();
+            }
+        };
+        Thread serverThread = new Thread(serverTask);
+        serverThread.start();
+//            serverSocket = new ServerSocket(portNumber);
 //            SocketAddress sockeAddress = new InetSocketAddress("127.0.0.1",portNumber);
 //            serverSocket.bind(sockeAddress);
-            clientSocket = serverSocket.accept();
-            LOGGER.info("Client Accepted " + clientSocket.getLocalPort() + "  " + clientSocket.getPort());
-            LOGGER.info("Context is  " + ctx);
-        }
-        catch(IOException ioException){
-            ioException.printStackTrace();
-        }
+//            clientSocket = serverSocket.accept();
     }
 
     public void listenAndRespondToData(){
@@ -95,10 +107,10 @@ public class SocketNew  {
         return result;
     }
 
-//    @PostConstruct
+    @PostConstruct
     public void startSocketProcedure() {
         serverStart(3333);
-        listenAndRespondToData();
+//        listenAndRespondToData();
     }
 
 //    "http://dbpedia.org/resource/Barack_Obama"
