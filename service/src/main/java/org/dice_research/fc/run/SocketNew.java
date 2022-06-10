@@ -1,10 +1,13 @@
 package org.dice_research.fc.run;
 
+import org.aksw.jena_sparql_api.core.QueryExecutionFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.dice_research.fc.IFactChecker;
+import org.dice_research.fc.config.RequestParameters;
 import org.dice_research.fc.data.FactCheckingResult;
+import org.dice_research.fc.paths.verbalizer.IPathVerbalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,9 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -68,27 +74,26 @@ public class SocketNew  {
     public void listenAndRespondToData(){
         try {
             inputStream = clientSocket.getInputStream();
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
             outputStream = new DataOutputStream(clientSocket.getOutputStream());
-            BufferedReader reader = new BufferedReader(inputStreamReader);
+            DataInputStream in = new DataInputStream(inputStream);
             String data = "";
             while (true) {
+                byte[] buffer = new byte[1024]; // or 4096, or more
+                in.read(buffer);
+                data = new String(buffer, "ISO-8859-1").trim();
+                data = data.substring(0,data.length() - 1);
+                data = data.replaceAll("[><]","");
+                LOGGER.info("GOT DATA AND DATA IS " + data);
+                String[] dataArray = data.split(" ");
+                LOGGER.info("Length of data array is" + dataArray.length);
+                String subject = dataArray[0];
+                String property = dataArray[1];
+                String object = dataArray[2];
                 try {
-                    data = reader.readLine();
-                    LOGGER.info("GOT DATA AND DATA IS " + data);
-                    String[] dataArray = data.split(" ");
-                    String subject = dataArray[0];
-                    String object = dataArray[1];
-                    String property = dataArray[2];
-                    outputStream.writeUTF(data);
-                    try {
                         FactCheckingResult result = evaluateTriples(subject,object,property);
                         outputStream.writeUTF(String.valueOf(result.getVeracityValue()));
-                    } catch (Exception e) {
-                        LOGGER.info("SOME EXCEPTION OCCURED " + e);
-                    }
-                } catch (IOException exception) {
-                    exception.printStackTrace();
+                } catch (Exception e) {
+                    LOGGER.info("SOME EXCEPTION OCCURED " + e);
                 }
             }
         }
@@ -104,6 +109,11 @@ public class SocketNew  {
         LOGGER.info("The data are " + subjectURI + " " + objectURI + " " + propertyURI);
         IFactChecker factChecker = ctx.getBean(IFactChecker.class);
         FactCheckingResult result = factChecker.check(subjectURI, propertyURI, objectURI);
+
+        IPathVerbalizer verbalizer = ctx.getBean(IPathVerbalizer.class, ctx.getBean(QueryExecutionFactory.class), new RequestParameters());
+        verbalizer.verbalizeResult(result);
+
+        LOGGER.info("Result is " + result.getVeracityValue());
         return result;
     }
 
@@ -117,4 +127,7 @@ public class SocketNew  {
 //    "http://dbpedia.org/resource/United_States"
 //    "http://dbpedia.org/ontology/nationality"
 //    "http://dbpedia.org/resource/Barack_Obama http://dbpedia.org/resource/United_States http://dbpedia.org/ontology/nationality"
+    // "http://dbpedia.org/resource/Alexander_Kerensky http://dbpedia.org/resource/Ulyanovsk http://dbpedia.org/ontology/birthPlace"
+    //"http://localhost:8080/api/v1/validate?subject=http://dbpedia.org/resource/Barack_Obama&object=http://dbpedia.org/resource/United_States&property=http://dbpedia.org/ontology/nationality&pathlength=2"
+    //http://localhost:8080/api/v1/validate?subject=http://dbpedia.org/resource/Alexander_Kerensky&object=http://dbpedia.org/resource/Ulyanovsk&property=http://dbpedia.org/ontology/birthplace&pathlength=2
 }
