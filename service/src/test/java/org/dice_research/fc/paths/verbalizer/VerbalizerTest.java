@@ -48,13 +48,13 @@ public class VerbalizerTest {
     this.isEmptyExpected = isEmptyExpected;
   }
 
-  @Test
-  public void testVerbalization() {
-    IPathVerbalizer verbalizer = new DefaultPathVerbalizer(qef);
-    String output = verbalizer.verbalizePaths(subject, object, path);
-    System.out.println(output);
-    Assert.assertEquals(isEmptyExpected, output.isEmpty());
-  }
+//  @Test
+//  public void testVerbalization() {
+//    IPathVerbalizer verbalizer = new DefaultPathVerbalizer(qef);
+//    String output = verbalizer.verbalizePaths(subject, object, path);
+//    System.out.println(output);
+//    Assert.assertEquals(isEmptyExpected, output.isEmpty());
+//  }
 
   @Parameters
   public static Collection<Object[]> data() {
