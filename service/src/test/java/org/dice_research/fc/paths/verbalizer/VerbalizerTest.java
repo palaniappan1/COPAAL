@@ -53,7 +53,7 @@ public class VerbalizerTest {
     IPathVerbalizer verbalizer = new DefaultPathVerbalizer(qef);
     String output = verbalizer.verbalizePaths(subject, object, path);
     System.out.println(output);
-//    Assert.assertEquals(isEmptyExpected, output.isEmpty());
+    Assert.assertEquals(isEmptyExpected, output.isEmpty());
   }
 
   @Parameters
