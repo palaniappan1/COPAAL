@@ -35,6 +35,9 @@ public class SocketNew  {
     //OutputStream to send the data to the client
     DataOutputStream outputStream  = null;
 
+    //
+    BufferedReader bufferedReader = null;
+
     //ServerSocket Object
     ServerSocket serverSocket = null;
 
@@ -70,7 +73,7 @@ public class SocketNew  {
         try {
             inputStream = clientSocket.getInputStream();
             outputStream = new DataOutputStream(clientSocket.getOutputStream());
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             while (true) {
                 StringBuffer sb = new StringBuffer();
                 try{
@@ -103,6 +106,13 @@ public class SocketNew  {
         }
         catch(IOException ioException){
             ioException.printStackTrace();
+            try {
+                outputStream.close();
+                bufferedReader.close();
+                inputStream.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
