@@ -5,7 +5,7 @@ RUN git clone "https://github.com/palaniappan1/COPAAL"
 
 FROM maven:3.6.0-jdk-11-slim AS build
 COPY /service/pom.xml .
-RUN mvn -B -f pom.xml dependency:go-offline
+RUN mvn -f pom.xml clean package
 COPY . /app
 COPY service/target/corraborative-2.2.2.jar /app
 EXPOSE 3333
