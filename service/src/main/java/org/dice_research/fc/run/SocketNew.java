@@ -101,6 +101,9 @@ public class SocketNew  {
                         outputStream.writeUTF(String.valueOf(result.getVeracityValue()));
                 } catch (Exception e) {
                     LOGGER.info("SOME EXCEPTION OCCURED " + e);
+                    outputStream.close();
+                    bufferedReader.close();
+                    inputStream.close();
                 }
             }
         }
