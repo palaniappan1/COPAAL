@@ -20,6 +20,7 @@ import javax.annotation.PostConstruct;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 @Component()
 public class SocketNew  {
@@ -75,30 +76,29 @@ public class SocketNew  {
             outputStream = new DataOutputStream(clientSocket.getOutputStream());
             bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             while (true) {
-                StringBuffer sb = new StringBuffer();
-                try{
-                    String currentLine;
-                    while((currentLine = bufferedReader.readLine()) != null){
-                        sb.append(currentLine);
-                        if(sb.indexOf("}") != -1){
-                            break;
-                        }
-                    }
+                String data;
+                DataInputStream in = new DataInputStream(inputStream);
+                byte[] buffer = new byte[1024]; // or 4096, or more
+                in.read(buffer);
+                data = new String(buffer, StandardCharsets.UTF_8).trim();
+                // At the eof, empty line is being sent to avoid that adding this check
+                if(data.equals("")){
+//                    LOGGER.info("Connection closed");
+//                    clientSocket.close();
+                    return;
                 }
-                catch(Exception e){
-                  e.printStackTrace();
-                }
-                LOGGER.info("GOT DATA AND DATA IS " + sb);
-                JSONObject jsonObject = new JSONObject(sb.toString());
+                JSONObject jsonObject = new JSONObject(data);
                 LOGGER.info("GOT DATA AND DATA IS " + jsonObject);
-                LOGGER.info("Length of json object is" + jsonObject.length());
                 String subject = jsonObject.getString("subject");
                 String property = jsonObject.getString("predicate");
                 String object = jsonObject.getString("object");
                 LOGGER.info("GOT DATA AND Subject is  " + subject + " and object is " + object + "and the predicate is" + property);
                 try {
                         FactCheckingResult result = evaluateTriples(subject,object,property);
-                        outputStream.writeUTF(String.valueOf(result.getVeracityValue()));
+                        JSONObject response = new JSONObject();
+                        response.put("type","test_result");
+                        response.append("score",String.valueOf(result.getVeracityValue()));
+                        outputStream.write(response.toString().getBytes(StandardCharsets.UTF_8));
                 } catch (Exception e) {
                     LOGGER.info("SOME EXCEPTION OCCURED " + e);
                     outputStream.close();
