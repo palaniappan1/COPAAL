@@ -93,7 +93,6 @@ public class SocketNew  {
                 DataInputStream in = new DataInputStream(inputStream);
                 byte[] buffer = new byte[1024]; // or 4096, or more
                 in.read(buffer);
-                outputStream.writeUTF("Received some message");
                 data = new String(buffer, StandardCharsets.UTF_8).trim();
                 // At the eof, empty line is being sent to avoid that adding this check
                 if(data.equals("")){
