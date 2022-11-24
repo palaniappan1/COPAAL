@@ -94,10 +94,11 @@ public class SocketNew  {
                 String object = jsonObject.getString("object");
                 LOGGER.info("GOT DATA AND Subject is  " + subject + " and object is " + object + "and the predicate is" + property);
                 try {
-                        FactCheckingResult result = evaluateTriples(subject,object,property);
+//                        FactCheckingResult result = evaluateTriples(subject,object,property);
                         JSONObject response = new JSONObject();
                         response.put("type","test_result");
-                        response.append("score",String.valueOf(result.getVeracityValue()));
+//                        response.append("score",String.valueOf(result.getVeracityValue()));
+                        response.append("score",0.789);
                         outputStream.write(response.toString().getBytes(StandardCharsets.UTF_8));
                 } catch (Exception e) {
                     LOGGER.info("SOME EXCEPTION OCCURED " + e);
