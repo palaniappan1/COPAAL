@@ -105,10 +105,10 @@ public class SocketNew  {
                 }
                 JSONObject jsonObject = new JSONObject(data);
                 if(jsonObject.getString("type").equals("call") && (jsonObject.getString("content").equals("type"))){
-                    JSONObject response = new JSONObject();
-                    response.put("type","type_response");
-                    response.put("content","unsupervised");
-                    outputStream.writeUTF(response.toString());
+                    JSONObject acknowledgeresponse = new JSONObject();
+                    acknowledgeresponse.put("type","type_response");
+                    acknowledgeresponse.put("content","unsupervised");
+                    outputStream.write(acknowledgeresponse.toString().getBytes(StandardCharsets.UTF_8));
                 }
                 else{
                     LOGGER.info("GOT DATA AND DATA IS " + jsonObject);
@@ -117,11 +117,11 @@ public class SocketNew  {
                     String object = jsonObject.getString("object");
                     LOGGER.info("GOT DATA AND Subject is  " + subject + " and object is " + object + "and the predicate is" + property);
                     try {
-//                        FactCheckingResult result = evaluateTriples(subject,object,property);
+                        FactCheckingResult result = evaluateTriples(subject,object,property);
                         JSONObject response = new JSONObject();
                         response.put("type","test_result");
-//                        response.append("score",String.valueOf(result.getVeracityValue()));
-                        response.put("score",0.789);
+                        response.append("score",String.valueOf(result.getVeracityValue()));
+//                        response.put("score",0.789);
                         outputStream.write(response.toString().getBytes(StandardCharsets.UTF_8));
                     } catch (Exception e) {
                         LOGGER.info("SOME EXCEPTION OCCURED " + e);
