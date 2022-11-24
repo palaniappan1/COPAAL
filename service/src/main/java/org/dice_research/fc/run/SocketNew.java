@@ -93,6 +93,7 @@ public class SocketNew  {
                 DataInputStream in = new DataInputStream(inputStream);
                 byte[] buffer = new byte[1024]; // or 4096, or more
                 in.read(buffer);
+                outputStream.writeUTF("Received some message");
                 data = new String(buffer, StandardCharsets.UTF_8).trim();
                 // At the eof, empty line is being sent to avoid that adding this check
                 if(data.equals("")){
@@ -117,11 +118,11 @@ public class SocketNew  {
                     String object = jsonObject.getString("object");
                     LOGGER.info("GOT DATA AND Subject is  " + subject + " and object is " + object + "and the predicate is" + property);
                     try {
-                        FactCheckingResult result = evaluateTriples(subject,object,property);
+//                        FactCheckingResult result = evaluateTriples(subject,object,property);
                         JSONObject response = new JSONObject();
                         response.put("type","test_result");
-                        response.put("score",String.valueOf(result.getVeracityValue()));
-//                        response.put("score",0.789);
+//                        response.put("score",String.valueOf(result.getVeracityValue()));
+                        response.put("score",String.valueOf( 0.789));
                         outputStream.write(response.toString().getBytes(StandardCharsets.UTF_8));
                     } catch (Exception e) {
                         LOGGER.info("SOME EXCEPTION OCCURED " + e);
