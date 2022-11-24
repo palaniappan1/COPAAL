@@ -120,7 +120,7 @@ public class SocketNew  {
                         FactCheckingResult result = evaluateTriples(subject,object,property);
                         JSONObject response = new JSONObject();
                         response.put("type","test_result");
-                        response.append("score",String.valueOf(result.getVeracityValue()));
+                        response.put("score",String.valueOf(result.getVeracityValue()));
 //                        response.put("score",0.789);
                         outputStream.write(response.toString().getBytes(StandardCharsets.UTF_8));
                     } catch (Exception e) {
