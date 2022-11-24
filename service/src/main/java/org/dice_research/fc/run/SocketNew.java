@@ -64,6 +64,19 @@ public class SocketNew  {
         };
         Thread serverThread = new Thread(serverTask);
         serverThread.start();
+        serverThread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                LOGGER.info("SOME EXCEPTION OCCURED " + e);
+                try {
+                    outputStream.close();
+                    bufferedReader.close();
+                    inputStream.close();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
 //            serverSocket = new ServerSocket(portNumber);
 //            SocketAddress sockeAddress = new InetSocketAddress("127.0.0.1",portNumber);
 //            serverSocket.bind(sockeAddress);
@@ -87,6 +100,9 @@ public class SocketNew  {
 //                    clientSocket.close();
                     return;
                 }
+                if(data.charAt(0) == 'b') {
+                    data = data.substring(2, data.length() - 1);
+                }
                 JSONObject jsonObject = new JSONObject(data);
                 LOGGER.info("GOT DATA AND DATA IS " + jsonObject);
                 String subject = jsonObject.getString("subject");
@@ -98,7 +114,7 @@ public class SocketNew  {
                         JSONObject response = new JSONObject();
                         response.put("type","test_result");
 //                        response.append("score",String.valueOf(result.getVeracityValue()));
-                        response.append("score",0.789);
+                        response.put("score",0.789);
                         outputStream.write(response.toString().getBytes(StandardCharsets.UTF_8));
                 } catch (Exception e) {
                     LOGGER.info("SOME EXCEPTION OCCURED " + e);
