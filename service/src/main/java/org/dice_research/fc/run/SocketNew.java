@@ -53,9 +53,8 @@ public class SocketNew  {
                 LOGGER.info("Waiting for clients to connect...");
                 while (true) {
                     clientSocket = serverSocket.accept();
-                    listenAndRespondToData();
                     LOGGER.info("Client Accepted " + clientSocket.getLocalPort() + "  " + clientSocket.getPort());
-                    LOGGER.info("Context is  " + ctx);
+                    listenAndRespondToData();
                 }
             } catch (IOException e) {
                 System.err.println("Unable to process client request");
@@ -69,6 +68,7 @@ public class SocketNew  {
             public void uncaughtException(Thread t, Throwable e) {
                 LOGGER.info("SOME EXCEPTION OCCURED " + e);
                 try {
+                    outputStream.writeUTF(e.toString());
                     outputStream.close();
                     bufferedReader.close();
                     inputStream.close();
@@ -118,6 +118,7 @@ public class SocketNew  {
                         outputStream.write(response.toString().getBytes(StandardCharsets.UTF_8));
                 } catch (Exception e) {
                     LOGGER.info("SOME EXCEPTION OCCURED " + e);
+                    outputStream.writeUTF(e.toString());
                     outputStream.close();
                     bufferedReader.close();
                     inputStream.close();
@@ -127,6 +128,7 @@ public class SocketNew  {
         catch(IOException ioException){
             ioException.printStackTrace();
             try {
+                outputStream.writeUTF(ioException.toString());
                 outputStream.close();
                 bufferedReader.close();
                 inputStream.close();
