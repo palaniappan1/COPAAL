@@ -94,6 +94,7 @@ public class SocketNew  {
                 byte[] buffer = new byte[1024]; // or 4096, or more
                 in.read(buffer);
                 data = new String(buffer, StandardCharsets.UTF_8).trim();
+                outputStream.writeUTF(data);
                 // At the eof, empty line is being sent to avoid that adding this check
                 if(data.equals("")){
 //                    LOGGER.info("Connection closed");
