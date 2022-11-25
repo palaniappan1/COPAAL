@@ -41,7 +41,7 @@ public class FactCheckingResult {
    * @return the veracityValue
    */
   public double getVeracityValue() {
-    return 0.765;
+    return veracityValue;
   }
 
   /**
