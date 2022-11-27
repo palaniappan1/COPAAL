@@ -67,13 +67,7 @@ public class SocketNew  {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 LOGGER.info("SOME EXCEPTION OCCURED " + e);
-                try {
-                    outputStream.close();
-                    bufferedReader.close();
-                    inputStream.close();
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
+                sendResult(0.0);
             }
         });
 //            serverSocket = new ServerSocket(portNumber);
@@ -117,29 +111,16 @@ public class SocketNew  {
                     LOGGER.info("GOT DATA AND Subject is  " + subject + " and object is " + object + "and the predicate is" + property);
                     try {
                         FactCheckingResult result = evaluateTriples(subject,object,property);
-                        JSONObject response = new JSONObject();
-                        response.put("type","test_result");
-                        response.put("score",String.valueOf(result.getVeracityValue()));
-//                        response.put("score",String.valueOf( 0.789));
-                        outputStream.write(response.toString().getBytes(StandardCharsets.UTF_8));
+                        sendResult(result.getVeracityValue());
                     } catch (Exception e) {
                         LOGGER.info("SOME EXCEPTION OCCURED " + e);
-                        outputStream.close();
-                        bufferedReader.close();
-                        inputStream.close();
+                        sendResult(0.0);
                     }
                 }
             }
         }
         catch(IOException ioException){
             ioException.printStackTrace();
-            try {
-                outputStream.close();
-                bufferedReader.close();
-                inputStream.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 
@@ -156,6 +137,17 @@ public class SocketNew  {
 
         LOGGER.info("Result is " + result.getVeracityValue());
         return result;
+    }
+
+    public void sendResult(double result){
+        JSONObject response = new JSONObject();
+        response.put("type","test_result");
+        response.put("score",String.valueOf(result));
+        try {
+            outputStream.write(response.toString().getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @PostConstruct
