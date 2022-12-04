@@ -3,13 +3,16 @@ package org.dice_research.fc.sparql.query;
 import javassist.NotFoundException;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.ConnectionPoolTimeoutException;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.*;
@@ -24,6 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
@@ -164,12 +168,14 @@ public class QueryEngineCustomHTTP implements QueryExecution {
         HttpRequestBase request = null;
         if(isPostRequest) {
             HttpPost post = new HttpPost(service);
-            post.setEntity(new StringEntity(query.toString()));
+            ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
+            postParameters.add(new BasicNameValuePair("query", query.toString()));
+            post.setEntity(new UrlEncodedFormEntity(postParameters,"UTF-8"));
             request = post;
         } else {
             request = new HttpGet(service + "?query=" + URLEncoder.encode(query.toString(), "UTF-8"));
         }
-        request.addHeader(HttpHeaders.CONTENT_TYPE, "application/sparql-update");
+        request.addHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
 
         if(timeout > 0) {
             RequestConfig config = RequestConfig.custom()
