@@ -67,7 +67,7 @@ public class SocketNew  {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 LOGGER.info("SOME EXCEPTION OCCURED " + e);
-                sendResult(0.0);
+                sendResult(-1.0);
             }
         });
 //            serverSocket = new ServerSocket(portNumber);
@@ -114,7 +114,7 @@ public class SocketNew  {
                         sendResult(result.getVeracityValue());
                     } catch (Exception e) {
                         LOGGER.info("SOME EXCEPTION OCCURED " + e);
-                        sendResult(0.0);
+                        sendResult(-1.0);
                     }
                 }
             }
