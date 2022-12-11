@@ -1,7 +1,6 @@
 package org.dice_research.fc.run;
 
 import org.aksw.jena_sparql_api.core.QueryExecutionFactory;
-import org.apache.commons.io.LineIterator;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -67,7 +66,7 @@ public class SocketNew  {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 LOGGER.info("SOME EXCEPTION OCCURED " + e);
-                sendResult(-1.0);
+                sendResult(-1.0,e.toString());
             }
         });
 //            serverSocket = new ServerSocket(portNumber);
@@ -111,10 +110,10 @@ public class SocketNew  {
                     LOGGER.info("GOT DATA AND Subject is  " + subject + " and object is " + object + "and the predicate is" + property);
                     try {
                         FactCheckingResult result = evaluateTriples(subject,object,property);
-                        sendResult(result.getVeracityValue());
+                        sendResult(result.getVeracityValue(),"");
                     } catch (Exception e) {
                         LOGGER.info("SOME EXCEPTION OCCURED " + e);
-                        sendResult(-1.0);
+                        sendResult(-1.0, e.toString());
                     }
                 }
             }
@@ -139,10 +138,11 @@ public class SocketNew  {
         return result;
     }
 
-    public void sendResult(double result){
+    public void sendResult(double result, String exception){
         JSONObject response = new JSONObject();
         response.put("type","test_result");
         response.put("score",String.valueOf(result));
+        response.put("exception",exception);
         try {
             outputStream.write(response.toString().getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
