@@ -92,7 +92,7 @@ public class SocketNew  {
     private void checkWhetherFusekiServerIsRunning() throws IOException {
         HttpClient client;
         HttpRequestBase request = null;
-        String service = "http://localhost:3030/ds/sparql";
+        String service = "http://127.0.0.1:3030/ds/sparql";
         HttpPost post = new HttpPost(service);
         String query = "SELECT * WHERE {\n" +
                 "  ?sub ?pred ?obj .\n" +
