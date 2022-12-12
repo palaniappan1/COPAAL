@@ -1,6 +1,18 @@
 package org.dice_research.fc.run;
 
 import org.aksw.jena_sparql_api.core.QueryExecutionFactory;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -20,6 +32,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 @Component()
 public class SocketNew  {
@@ -44,7 +57,8 @@ public class SocketNew  {
     //Client Socket Object
     Socket clientSocket = null;
 
-    public void serverStart(int portNumber) {
+    public void serverStart(int portNumber) throws IOException {
+        checkWhetherFusekiServerIsRunning();
         Runnable serverTask = () -> {
             try {
                 serverSocket = new ServerSocket(portNumber);
@@ -73,6 +87,33 @@ public class SocketNew  {
 //            SocketAddress sockeAddress = new InetSocketAddress("127.0.0.1",portNumber);
 //            serverSocket.bind(sockeAddress);
 //            clientSocket = serverSocket.accept();
+    }
+
+    private void checkWhetherFusekiServerIsRunning() throws IOException {
+        HttpClient client;
+        HttpRequestBase request = null;
+        String service = "http://localhost:3030/ds/sparql";
+        HttpPost post = new HttpPost(service);
+        String query = "SELECT * WHERE {\n" +
+                "  ?sub ?pred ?obj .\n" +
+                "} LIMIT 2";
+        ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
+        postParameters.add(new BasicNameValuePair("query", query.toString()));
+        post.setEntity(new UrlEncodedFormEntity(postParameters,"UTF-8"));
+        request = post;
+        request.addHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
+        request.addHeader(HttpHeaders.ACCEPT, "application/sparql-results+xml");
+        client = HttpClients
+                .custom()
+                .build();
+        HttpResponse httpResponse = client.execute(request);
+        String result = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+        ResultSet resultSet = ResultSetFactory.fromXML(result);
+        if(resultSet.hasNext()){
+            if(!resultSet.nextBinding().isEmpty()){
+                LOGGER.info("Apache Jena Fuseki Server is Up and Running");
+            }
+        }
     }
 
     public void listenAndRespondToData(){
@@ -152,7 +193,12 @@ public class SocketNew  {
 
     @PostConstruct
     public void startSocketProcedure() {
+        try{
         serverStart(3333);
+        }catch (IOException ioException){
+            LOGGER.info("Got Exception :" + ioException);
+        }
+
 //        listenAndRespondToData();
     }
 
