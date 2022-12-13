@@ -57,8 +57,8 @@ public class SocketNew  {
     //Client Socket Object
     Socket clientSocket = null;
 
-    public void serverStart(int portNumber) throws IOException {
-        checkWhetherFusekiServerIsRunning();
+    public void serverStart(int portNumber){
+//        checkWhetherFusekiServerIsRunning();
         Runnable serverTask = () -> {
             try {
                 serverSocket = new ServerSocket(portNumber);
@@ -193,11 +193,7 @@ public class SocketNew  {
 
     @PostConstruct
     public void startSocketProcedure() {
-        try{
         serverStart(3333);
-        }catch (IOException ioException){
-            LOGGER.info("Got Exception :" + ioException);
-        }
 
 //        listenAndRespondToData();
     }
