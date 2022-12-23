@@ -23,7 +23,7 @@ public class Path {
      * This make many to many relation with PathElement table
      */
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "pathelements_paths",
             joinColumns = @JoinColumn(name = "path_id"),
