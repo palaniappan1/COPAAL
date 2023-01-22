@@ -20,6 +20,7 @@ import org.dice_research.fc.IFactChecker;
 import org.dice_research.fc.config.RequestParameters;
 import org.dice_research.fc.data.FactCheckingResult;
 import org.dice_research.fc.paths.verbalizer.IPathVerbalizer;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,18 @@ import java.util.ArrayList;
 
 @Component()
 public class SocketNew  {
+
+    /*
+        This class contains code for Socket Communication between client and server.
+        Once the Client connects to the socket, the server will be listening indefinitely for assertions.
+        Once the truth value is computed, it will send the result value back to the user.
+        Socket is running on the port 3333.
+        For testing purpose, after running the copaal application using mvn clean install,
+        You can use the command "nc localhost 3333" to connect to the server.
+        And use this triple as an input : {"type": "test", "subject": "http://dbpedia.org/resource/Barack_Obama",
+        "object": "http://dbpedia.org/resource/United_States",  "predicate": "http://dbpedia.org/ontology/nationality"}
+
+    */
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SocketNew.class);
 
@@ -57,7 +70,12 @@ public class SocketNew  {
     //Client Socket Object
     Socket clientSocket = null;
 
-    public void serverStart(int portNumber){
+    public void serverStart(int portNumber) {
+        /*
+        *  Code for staring the server socket in the given port number.
+        *  The server is being start on different thread.
+        *
+        * */
 //        checkWhetherFusekiServerIsRunning();
         Runnable serverTask = () -> {
             try {
@@ -83,13 +101,14 @@ public class SocketNew  {
                 sendResult(-1.0,e.toString());
             }
         });
-//            serverSocket = new ServerSocket(portNumber);
-//            SocketAddress sockeAddress = new InetSocketAddress("127.0.0.1",portNumber);
-//            serverSocket.bind(sockeAddress);
-//            clientSocket = serverSocket.accept();
     }
 
     private void checkWhetherFusekiServerIsRunning() throws IOException {
+        /*
+            We have our own dbpedia endpoint for validating facts and the data is hosted in
+            Apache Jena Fuseki Server. In order for our application to work fine, we need the fuseki server
+            to be up and running. This code is to check whether the fuseki server is up and running .
+        */
         HttpClient client;
         HttpRequestBase request = null;
         String service = "http://127.0.0.1:3030/ds/sparql";
@@ -117,6 +136,10 @@ public class SocketNew  {
     }
 
     public void listenAndRespondToData(){
+        /*
+            Here is where the user input is being listened by the server using Socket InputStream.
+            We get the data in jsonFormat, need to unwrap data from th json.
+         */
         try {
             inputStream = clientSocket.getInputStream();
             outputStream = new DataOutputStream(clientSocket.getOutputStream());
@@ -165,6 +188,10 @@ public class SocketNew  {
     }
 
     public FactCheckingResult evaluateTriples(String subject, String object, String property){
+        /*
+            The main method of evaluating the triples given by the user.
+         */
+
         Resource subjectURI = ResourceFactory.createResource(subject);
         Resource objectURI = ResourceFactory.createResource(object);
         Property propertyURI = ResourceFactory.createProperty(property);
@@ -180,6 +207,9 @@ public class SocketNew  {
     }
 
     public void sendResult(double result, String exception){
+        /*
+          The method to send the result back to the user via the socketOutputStream.
+         */
         JSONObject response = new JSONObject();
         response.put("type","test_result");
         response.put("score",String.valueOf(result));
@@ -197,15 +227,4 @@ public class SocketNew  {
 
 //        listenAndRespondToData();
     }
-
-//    "http://dbpedia.org/resource/Barack_Obama"
-//    "http://dbpedia.org/resource/United_States"
-//    "http://dbpedia.org/ontology/nationality"
-    //http://dbpedia.org/resource/Real_Madrid_CF http://dbpedia.org/property/name http://dbpedia.org/resource/Toni_Fuidias
-//    "http://dbpedia.org/resource/Barack_Obama http://dbpedia.org/resource/United_States http://dbpedia.org/ontology/nationality"
-    // "http://dbpedia.org/resource/Alexander_Kerensky http://dbpedia.org/resource/Ulyanovsk http://dbpedia.org/ontology/birthPlace"
-    //"http://localhost:8080/api/v1/validate?subject=http://dbpedia.org/resource/Barack_Obama&object=http://dbpedia.org/resource/United_States&property=http://dbpedia.org/ontology/nationality&pathlength=2"
-    //http://localhost:8080/api/v1/validate?subject=http://dbpedia.org/resource/Alexander_Kerensky&object=http://dbpedia.org/resource/Ulyanovsk&property=http://dbpedia.org/ontology/birthplace&pathlength=2
-
-    //
 }
